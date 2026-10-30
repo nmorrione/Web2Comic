@@ -169,8 +169,10 @@ public sealed partial class CbzMaker : IAsyncDisposable
                 .map(i => i.currentSrc || i.src)
                 .filter(s => s && !s.startsWith('blob:')))]", minSide);
 
-        // Reader a una pagina per volta: le pagine si ottengono sfogliandolo
-        if (forceReader || await LooksLikeReaderAsync(page))
+        // Reader a una pagina per volta: le pagine si ottengono sfogliandolo. Si prova anche quando la pagina
+        // mostra solo una o due immagini: la prima pagina di un capitolo può essere piccola (un frontespizio)
+        // e non sembrare un reader. Se sfogliando non cambia nulla, si tengono le immagini trovate.
+        if (forceReader || srcs.Length is 1 or 2 || await LooksLikeReaderAsync(page))
         {
             if (await ReadReaderAsync(page, guard, forceReader, log, ct) is { } pages)
                 srcs = pages;
