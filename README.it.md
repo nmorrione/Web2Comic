@@ -39,6 +39,7 @@
 - ⚡ **Più capitoli in parallelo**: fino a 8 capitoli insieme, circa il doppio più veloce; se il sito ha un intoppo momentaneo, il capitolo viene riprovato da solo.
 - 📚 **EPUB con i dati della serie**: titolo, serie, numero del capitolo, autore e trama compaiono nella libreria dell'ebook reader. Con un clic, ottimizzato per **Kobo**.
 - 🖼️ **Immagini originali**: nessuna ricompressione, la qualità resta quella del sito.
+- 🔎 **Controllo finale**: a fine lavoro il log elenca le pagine arrivate incomplete dal sito e i numeri di capitolo che mancano nella sequenza, così sai subito se c'è qualcosa da rifare.
 - 🛡️ **Niente pubblicità**: popup e nuove schede vengono chiusi, e la pagina non può essere portata su altri siti.
 - 🌍 **In italiano, inglese e spagnolo**: parte nella lingua del sistema e si cambia al volo con le bandierine in alto.
 - 💼 **Portable**: un unico file da avviare, niente installazione.

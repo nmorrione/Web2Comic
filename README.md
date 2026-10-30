@@ -39,6 +39,7 @@
 - ⚡ **Several chapters in parallel**: up to 8 chapters at once, about twice as fast; if the site has a momentary hiccup, the chapter is retried automatically.
 - 📚 **EPUB with series details**: title, series, chapter number, author and summary show up in your ebook reader's library. One click makes it **Kobo**-optimized.
 - 🖼️ **Original images**: no recompression, the quality stays the same as on the site.
+- 🔎 **Final check**: at the end the log lists the pages that came incomplete from the site and the chapter numbers missing from the sequence, so you know right away if something needs redoing.
 - 🛡️ **No ads**: pop-ups and new tabs are closed, and the page can't be taken to other sites.
 - 🌍 **In English, Italian and Spanish**: starts in your system language and switches on the fly with the flags at the top.
 - 💼 **Portable**: a single file to run, nothing to install.

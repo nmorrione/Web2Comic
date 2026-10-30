@@ -39,6 +39,7 @@
 - ⚡ **Varios capítulos en paralelo**: hasta 8 capítulos a la vez, aproximadamente el doble de rápido; si el sitio tiene un fallo momentáneo, el capítulo se reintenta solo.
 - 📚 **EPUB con los datos de la serie**: título, serie, número de capítulo, autor y sinopsis aparecen en la biblioteca de tu lector. Con un clic, optimizado para **Kobo**.
 - 🖼️ **Imágenes originales**: sin recompresión, la calidad es la misma que en el sitio.
+- 🔎 **Control final**: al terminar, el registro enumera las páginas que llegaron incompletas del sitio y los números de capítulo que faltan en la secuencia, así sabes enseguida si hay algo que rehacer.
 - 🛡️ **Sin publicidad**: las ventanas emergentes y las pestañas nuevas se cierran, y la página no puede llevarte a otros sitios.
 - 🌍 **En español, inglés e italiano**: arranca en el idioma del sistema y se cambia al momento con las banderas de arriba.
 - 💼 **Portable**: un único archivo para ejecutar, sin instalación.

@@ -1,5 +1,8 @@
 🇬🇧 English · [🇮🇹 Italiano](https://github.com/nmorrione/Web2Comic/blob/main/README.it.md) · [🇪🇸 Español](https://github.com/nmorrione/Web2Comic/blob/main/README.es.md)
 
+## What's new in 1.11.0
+- **Final check**: at the end of a job the log lists the pages that came incomplete from the site (they show partly grey; each one is downloaded again once before giving up) and the chapter numbers missing from the sequence, e.g. a chapter the site skipped.
+
 ## What's new in 1.10.1
 - Fixed page-by-page readers whose first page is a small image (e.g. a title page): the chapter was mistaken for "not available" and skipped.
 
