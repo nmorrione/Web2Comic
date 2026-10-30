@@ -1,5 +1,8 @@
 🇬🇧 English · [🇮🇹 Italiano](https://github.com/nmorrione/Web2Comic/blob/main/README.it.md) · [🇪🇸 Español](https://github.com/nmorrione/Web2Comic/blob/main/README.es.md)
 
+## What's new in 1.10.1
+- Fixed page-by-page readers whose first page is a small image (e.g. a title page): the chapter was mistaken for "not available" and skipped.
+
 ## What's new in 1.10.0
 - **Keep the computer awake until done** (ticked by default, next to the buttons): while a job is running the computer doesn't go to sleep, so you can leave it alone during a long download. Once the job is done or cancelled, everything goes back to normal.
 
