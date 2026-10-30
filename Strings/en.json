@@ -39,6 +39,8 @@
   "Main.StartVolume": "Create {0} volume",
   "Main.Convert": "Convert CBZ to EPUB...",
   "Main.ConvertTip": "Turns the .cbz files you already have in a folder into EPUB, without downloading anything",
+  "Main.KeepAwake": "Keep the computer awake until done",
+  "Main.KeepAwakeTip": "While the job is running the computer does not go to sleep, even if you leave it alone (the screen can still turn off). Once the job is done or cancelled, everything goes back to normal. On a laptop, closing the lid still puts it to sleep.",
 
   "Series.Series": "Series *",
   "Series.Language": "Language",

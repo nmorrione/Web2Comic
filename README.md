@@ -85,6 +85,7 @@ Usually **nothing**: Web2Comic works out on its own whether the page shows the w
 | **Optimized for Kobo** | You read the EPUBs on a Kobo. |
 | **Create a single volume** | You want all the chapters in one file instead of one per chapter. |
 | **Split into volumes of N chapters** | You're downloading a whole series: instead of one huge file you get one volume every N chapters. |
+| **Keep the computer awake until done** | You leave the computer alone during a long download (ticked by default; closing a laptop's lid still puts it to sleep). |
 | **Download several chapters in parallel** | You're downloading many chapters and want it faster (3 at a time is a good value; if the site starts giving errors, lower it). |
 
 Already have a folder full of `.cbz` files? The **Convert CBZ to EPUB...** button converts them all at once, without downloading anything, with a table to fix chapter numbers and titles.

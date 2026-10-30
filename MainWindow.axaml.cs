@@ -256,6 +256,8 @@ public partial class MainWindow : Window
         _cts = new CancellationTokenSource();
         IProgress<string> log = new Progress<string>(Log);
         bool antiBot = false;
+        // Il computer resta sveglio fino alla fine del lavoro (anche se annullato o finito con errori)
+        using var awake = chkKeepAwake.IsChecked == true ? KeepAwake.Start() : null;
         try
         {
             await using var maker = await CbzMaker.StartAsync(chkShow.IsChecked == true, log);
@@ -601,7 +603,7 @@ public partial class MainWindow : Window
         chkEpub.IsEnabled = chkVolume.IsEnabled = chkParallel.IsEnabled = !running;
         pnlEpub.IsEnabled = !running && chkEpub.IsChecked == true;
         numParallel.IsEnabled = !running && chkParallel.IsChecked == true;
-        chkSplit.IsEnabled = !running;
+        chkSplit.IsEnabled = chkKeepAwake.IsEnabled = !running;
         numSplit.IsEnabled = !running && chkSplit.IsChecked == true;
         progress.IsIndeterminate = running;
     }

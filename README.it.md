@@ -85,6 +85,7 @@ Di solito **niente**: Web2Comic capisce da solo se la pagina mostra tutto il cap
 | **Ottimizzato per Kobo** | Leggi gli EPUB su un Kobo. |
 | **Crea singolo volume** | Vuoi tutti i capitoli in un unico file invece di uno per capitolo. |
 | **Dividi in volumi da N capitoli** | Scarichi una serie intera: invece di un file enorme ottieni un volume ogni N capitoli. |
+| **Non sospendere il computer fino alla fine** | Lasci il computer da solo durante un download lungo (è già spuntata; su un portatile chiudere il coperchio lo sospende lo stesso). |
 | **Scarica più capitoli in parallelo** | Scarichi tanti capitoli e vuoi fare prima (3 alla volta è un buon valore; se il sito inizia a dare errori, abbassalo). |
 
 Hai già una cartella piena di `.cbz`? Il pulsante **Converti CBZ in EPUB...** li trasforma tutti in una volta, senza scaricare nulla, con una tabella per correggere numeri e titoli dei capitoli.

@@ -39,6 +39,8 @@
   "Main.StartVolume": "Crea volume {0}",
   "Main.Convert": "Converti CBZ in EPUB...",
   "Main.ConvertTip": "Trasforma in EPUB i .cbz che hai già in una cartella, senza scaricare nulla",
+  "Main.KeepAwake": "Non sospendere il computer fino alla fine",
+  "Main.KeepAwakeTip": "Finché il lavoro è in corso il computer non va in sospensione, anche se lo lasci da solo (lo schermo può comunque spegnersi). Finito o annullato il lavoro, torna come prima. Su un portatile chiudere il coperchio lo sospende lo stesso.",
 
   "Series.Series": "Serie *",
   "Series.Language": "Lingua",

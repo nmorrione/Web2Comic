@@ -39,6 +39,8 @@
   "Main.StartVolume": "Crear tomo {0}",
   "Main.Convert": "Convertir CBZ a EPUB...",
   "Main.ConvertTip": "Convierte a EPUB los .cbz que ya tienes en una carpeta, sin descargar nada",
+  "Main.KeepAwake": "No suspender el equipo hasta terminar",
+  "Main.KeepAwakeTip": "Mientras el trabajo está en curso el equipo no entra en suspensión, aunque lo dejes solo (la pantalla puede apagarse igualmente). Al terminar o cancelar el trabajo, todo vuelve a la normalidad. En un portátil, cerrar la tapa lo suspende igualmente.",
 
   "Series.Series": "Serie *",
   "Series.Language": "Idioma",
