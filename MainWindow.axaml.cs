@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using static Web2Comic.Loc;
 
 namespace Web2Comic;
@@ -529,10 +530,24 @@ public partial class MainWindow : Window
         progress.IsIndeterminate = running;
     }
 
+    // Il log tiene solo le ultime righe e la casella si aggiorna al massimo 5 volte al secondo:
+    // riscrivere a ogni riga un testo sempre più lungo rallentava il programma capitolo dopo capitolo
+    private const int MaxLogLines = 2000;
+    private readonly Queue<string> _logLines = new();
+    private bool _logPending;
+
     private void Log(string line)
     {
-        txtLog.Text += line + Environment.NewLine;
-        txtLog.CaretIndex = txtLog.Text.Length;
+        _logLines.Enqueue(line);
+        while (_logLines.Count > MaxLogLines) _logLines.Dequeue();
+        if (_logPending) return;
+        _logPending = true;
+        DispatcherTimer.RunOnce(() =>
+        {
+            _logPending = false;
+            txtLog.Text = string.Join(Environment.NewLine, _logLines) + Environment.NewLine;
+            txtLog.CaretIndex = txtLog.Text.Length;
+        }, TimeSpan.FromMilliseconds(200));
     }
 
     protected override void OnClosing(WindowClosingEventArgs e)

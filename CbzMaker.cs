@@ -304,7 +304,9 @@ public sealed partial class CbzMaker : IAsyncDisposable
                 try { return await r.BodyAsync(); }
                 catch (PlaywrightException) { }
             }
-            var resp = await context.APIRequest.GetAsync(src, new() { Headers = new Dictionary<string, string> { ["Referer"] = referer } });
+            // Va liberata subito: altrimenti Playwright tiene in memoria ogni immagine finché la sessione
+            // del browser (condivisa da tutti i capitoli) resta aperta
+            await using var resp = await context.APIRequest.GetAsync(src, new() { Headers = new Dictionary<string, string> { ["Referer"] = referer } });
             return resp.Ok ? await resp.BodyAsync() : null;
         }
         catch (Exception ex) when (ex is PlaywrightException or FormatException)
