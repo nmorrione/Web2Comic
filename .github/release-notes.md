@@ -1,5 +1,8 @@
 🇬🇧 English · [🇮🇹 Italiano](https://github.com/nmorrione/Web2Comic/blob/main/README.it.md) · [🇪🇸 Español](https://github.com/nmorrione/Web2Comic/blob/main/README.es.md)
 
+## What's new in 1.10.0
+- **Keep the computer awake until done** (ticked by default, next to the buttons): while a job is running the computer doesn't go to sleep, so you can leave it alone during a long download. Once the job is done or cancelled, everything goes back to normal.
+
 ## What's new in 1.9.0
 - **Split into volumes of N chapters**: with **Create a single volume** ticked, a whole series becomes Vol. 01, Vol. 02... of N chapters each, created one after the other, instead of one huge file (very slow on e-readers; the Kobo can't copy files over 4 GB). A chapter that can't be downloaded doesn't stop the job: the volume is created without it and the missing chapters are listed at the end.
 - The window fits better on smaller screens: the language flags are now on the chapter list row.
