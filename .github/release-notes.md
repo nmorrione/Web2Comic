@@ -1,5 +1,9 @@
 🇬🇧 English · [🇮🇹 Italiano](https://github.com/nmorrione/Web2Comic/blob/main/README.it.md) · [🇪🇸 Español](https://github.com/nmorrione/Web2Comic/blob/main/README.es.md)
 
+## What's new in 1.9.0
+- **Split into volumes of N chapters**: with **Create a single volume** ticked, a whole series becomes Vol. 01, Vol. 02... of N chapters each, created one after the other, instead of one huge file (very slow on e-readers; the Kobo can't copy files over 4 GB). A chapter that can't be downloaded doesn't stop the job: the volume is created without it and the missing chapters are listed at the end.
+- The window fits better on smaller screens: the language flags are now on the chapter list row.
+
 ## What's new in 1.8.2
 - No more slowdowns when downloading many chapters: images are released from memory as soon as they're saved, and the log keeps only its last 2000 lines.
 
