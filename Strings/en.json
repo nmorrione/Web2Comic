@@ -103,6 +103,9 @@
   "Log.SplitMissing": "⚠ Volume created without: {0}.",
   "Log.SplitIncomplete": "⚠ Volumes with missing chapters (you can redo them with from/to):",
   "Log.SplitDone": "Done: {0} of {1} volumes created.",
+  "Log.TruncatedSummary": "Pages that came incomplete from the site (partly grey; downloading them again won't help until the site fixes them):",
+  "Log.TruncatedChapter": "chapter {0}: p. {1}",
+  "Log.Gaps": "Chapter numbers missing from the created files: {0}. Check whether the site has them (sometimes a number is skipped or a chapter has a different number).",
   "Log.VolumeNumberInvalid": "Invalid volume number: \"{0}\". When splitting into several volumes it must be a whole number (e.g. 1), or leave it empty.",
 
   "Volume.FailedTitle": "Chapters not downloaded",
@@ -125,6 +128,7 @@
   "Engine.NotAvailable": "Found a single landscape image: the chapter is probably not available (yet).",
   "Engine.Found": "Found {0} images.",
   "Engine.Skipped": "skipped: {0}",
+  "Engine.Truncated": "page {0} is incomplete on the site too: kept as is (partly grey)",
   "Engine.Retry": "The site didn't respond as expected: retrying (attempt {0} of {1})...",
   "Engine.NoValidImages": "No valid images downloaded.",
   "Engine.AntiBot": "Anti-bot protection found on {0}: tick \"{1}\" and try again. If a check appears in the window, complete it yourself and the download will continue on its own.",

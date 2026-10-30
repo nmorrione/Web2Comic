@@ -46,7 +46,7 @@ internal static class Program
         try
         {
             await using var maker = await CbzMaker.StartAsync(showBrowser, log);
-            string file = await maker.CreateAsync(url, folder, null, 300, log, CancellationToken.None, forceReader);
+            string file = (await maker.CreateAsync(url, folder, null, 300, log, CancellationToken.None, forceReader)).Path;
             Console.WriteLine(Loc.T("Log.Created", file));
             return 0;
         }

@@ -68,10 +68,13 @@ public sealed partial class CbzMaker : IAsyncDisposable
             log.Report(T("Engine.WebKitReady"));
     }
 
+    /// <summary>Il .cbz creato e le pagine (numerate da 1) la cui immagine è arrivata incompleta dal sito.</summary>
+    public sealed record CbzResult(string Path, IReadOnlyList<int> TruncatedPages);
+
     /// <summary>Crea il .cbz e restituisce il percorso del file creato.</summary>
     /// <param name="fileName">Nome del file senza estensione; null per usare il titolo della pagina.</param>
     /// <param name="forceReader">Sfoglia la pagina come un reader anche se non viene riconosciuto da solo.</param>
-    public async Task<string> CreateAsync(string url, string outputFolder, string? fileName, int minSide,
+    public async Task<CbzResult> CreateAsync(string url, string outputFolder, string? fileName, int minSide,
         IProgress<string> log, CancellationToken ct, bool forceReader = false)
     {
         // Alcuni siti ogni tanto rispondono con una pagina d'errore o non rispondono in tempo:
@@ -96,7 +99,7 @@ public sealed partial class CbzMaker : IAsyncDisposable
     /// <summary>Nessuna immagine nella pagina: spesso un errore momentaneo del sito, si può riprovare.</summary>
     private sealed class NoImagesException(string message) : InvalidOperationException(message);
 
-    private async Task<string> CreateOnceAsync(string url, string outputFolder, string? fileName, int minSide,
+    private async Task<CbzResult> CreateOnceAsync(string url, string outputFolder, string? fileName, int minSide,
         IProgress<string> log, CancellationToken ct, bool forceReader)
     {
         var context = await ContextAsync();
@@ -138,7 +141,7 @@ public sealed partial class CbzMaker : IAsyncDisposable
         }
     }
 
-    private static async Task<string> CreateCoreAsync(IPage page, IBrowserContext context, string url,
+    private static async Task<CbzResult> CreateCoreAsync(IPage page, IBrowserContext context, string url,
         string outputFolder, string? fileName, int minSide, bool forceReader, bool headless, IProgress<string> log, CancellationToken ct)
     {
         // Tiene da parte le immagini scaricate dal browser, così non vanno riscaricate
@@ -198,6 +201,7 @@ public sealed partial class CbzMaker : IAsyncDisposable
 
         // Scrive su un file temporaneo: se qualcosa va storto non resta un .cbz a metà
         string tmpPath = outPath + ".part";
+        var truncated = new List<int>();
         try
         {
             // Un .part rimasto da un'esecuzione interrotta di colpo si sovrascrive
@@ -211,11 +215,22 @@ public sealed partial class CbzMaker : IAsyncDisposable
                     byte[]? data = await GetBytesAsync(src, responses, context, page.Url);
                     string? ext = data is null ? null : Extension(data);
                     if (data is null || ext is null) { log.Report("  " + T("Engine.Skipped", src)); continue; }
+                    // Immagine arrivata a metà: si riscarica una volta; se il sito la manda ancora così
+                    // si tiene lo stesso (meglio una pagina in parte grigia che una pagina mancante)
+                    if (IsTruncated(data, ext) && await GetBytesAsync(src, null, context, page.Url) is { } again
+                        && Extension(again) == ext && (!IsTruncated(again, ext) || again.Length > data.Length))
+                        data = again;
+                    bool incomplete = IsTruncated(data, ext);
 
                     var entry = zip.CreateEntry($"{++n:D3}{ext}", CompressionLevel.NoCompression);
                     using var s = entry.Open();
                     s.Write(data);
                     log.Report($"  {n:D3}  {data.Length / 1024,6} KB");
+                    if (incomplete)
+                    {
+                        truncated.Add(n);
+                        log.Report("  ⚠ " + T("Engine.Truncated", n));
+                    }
                 }
                 if (n == 0) throw new NoImagesException(T("Engine.NoValidImages"));
             }
@@ -227,7 +242,7 @@ public sealed partial class CbzMaker : IAsyncDisposable
             lock (ReservedPaths) ReservedPaths.Remove(outPath);
         }
 
-        return outPath;
+        return new CbzResult(outPath, truncated);
     }
 
     // Come UniquePath, ma tiene conto anche dei nomi scelti dai capitoli in corso, e prenota quello scelto
@@ -292,14 +307,15 @@ public sealed partial class CbzMaker : IAsyncDisposable
         return outPath;
     }
 
-    private static async Task<byte[]?> GetBytesAsync(string src, ConcurrentDictionary<string, IResponse> responses,
+    // Con responses null si riscarica sempre dal sito, senza usare quello che ha già il browser
+    private static async Task<byte[]?> GetBytesAsync(string src, ConcurrentDictionary<string, IResponse>? responses,
         IBrowserContext context, string referer)
     {
         try
         {
             if (src.StartsWith("data:"))
                 return Convert.FromBase64String(src[(src.IndexOf(',') + 1)..]);
-            if (responses.TryGetValue(src, out var r))
+            if (responses is not null && responses.TryGetValue(src, out var r))
             {
                 // I reader che ricaricano la pagina a ogni pagina fanno dimenticare al browser
                 // le risposte precedenti: in quel caso si riscarica l'immagine
@@ -326,6 +342,26 @@ public sealed partial class CbzMaker : IAsyncDisposable
         d.Length > 12 && d[8..12] is [0x57, 0x45, 0x42, 0x50] ? ".webp" :
         d.Length > 12 && d[4..8] is [0x66, 0x74, 0x79, 0x70] ? ".avif" :
         null;
+
+    /// <summary>
+    /// True se il file finisce prima del suo marcatore di fine (download interrotto o file già rovinato sul sito):
+    /// in un lettore la parte mancante della pagina appare grigia. Per AVIF non si controlla.
+    /// </summary>
+    internal static bool IsTruncated(byte[] d, string ext)
+    {
+        // Dopo la fine alcuni file hanno qualche byte di riempimento
+        static bool EndsWith(byte[] d, ReadOnlySpan<byte> marker, int slack) =>
+            d.AsSpan(Math.Max(0, d.Length - slack)).IndexOf(marker) >= 0;
+        return ext switch
+        {
+            ".jpg" => !EndsWith(d, [0xFF, 0xD9], 1024),
+            ".png" => !EndsWith(d, "IEND"u8, 1024),
+            ".gif" => !EndsWith(d, [0x3B], 16),
+            // Il RIFF dichiara la sua lunghezza all'inizio
+            ".webp" => BitConverter.ToUInt32(d, 4) + 8L > d.Length,
+            _ => false,
+        };
+    }
 
     internal static string SafeFileName(string s)
     {

@@ -103,6 +103,9 @@
   "Log.SplitMissing": "⚠ Tomo creado sin: {0}.",
   "Log.SplitIncomplete": "⚠ Tomos con capítulos que faltan (puedes rehacerlos con desde/hasta):",
   "Log.SplitDone": "Listo: {0} de {1} tomos creados.",
+  "Log.TruncatedSummary": "Páginas que llegaron incompletas del sitio (en parte grises; volver a descargarlas no sirve hasta que el sitio las corrija):",
+  "Log.TruncatedChapter": "capítulo {0}: pág. {1}",
+  "Log.Gaps": "Números de capítulo que faltan en los archivos creados: {0}. Comprueba si el sitio los tiene (a veces se salta un número o un capítulo tiene otro número).",
   "Log.VolumeNumberInvalid": "Número de tomo no válido: \"{0}\". Al dividir en varios tomos debe ser un número entero (p. ej. 1), o déjalo vacío.",
 
   "Volume.FailedTitle": "Capítulos no descargados",
@@ -125,6 +128,7 @@
   "Engine.NotAvailable": "Solo se encontró una imagen horizontal: probablemente el capítulo no está disponible (todavía).",
   "Engine.Found": "Se encontraron {0} imágenes.",
   "Engine.Skipped": "omitida: {0}",
+  "Engine.Truncated": "la página {0} también está incompleta en el sitio: se mantiene así (en parte gris)",
   "Engine.Retry": "El sitio no respondió como se esperaba: lo reintento (intento {0} de {1})...",
   "Engine.NoValidImages": "No se descargó ninguna imagen válida.",
   "Engine.AntiBot": "Se encontró una protección anti-bots en {0}: marca \"{1}\" y vuelve a intentarlo. Si aparece una verificación en la ventana, complétala tú y la descarga seguirá sola.",

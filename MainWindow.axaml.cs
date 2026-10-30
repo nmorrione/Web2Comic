@@ -266,6 +266,7 @@ public partial class MainWindow : Window
                 : job.Volume
                 ? await CreateVolumeAsync(maker, job, log, _cts.Token)
                 : await CreateChaptersAsync(maker, job, log, _cts.Token);
+            ReportChecks(job, log);
             if (antiBot)
             {
                 // Basta premere di nuovo il pulsante: il browser visibile è già selezionato
@@ -308,6 +309,55 @@ public partial class MainWindow : Window
         public int SplitSize { get; init; }
         /// <summary>Impostato quando il volume è stato creato.</summary>
         public bool Created { get; set; }
+        /// <summary>Quello che serve al riepilogo finale (condiviso dai volumi di una divisione).</summary>
+        public Checks Checks { get; init; } = new();
+    }
+
+    /// <summary>Capitoli finiti nei file creati: i loro numeri e le pagine arrivate incomplete dal sito.</summary>
+    private sealed class Checks
+    {
+        public readonly List<double> Numbers = [];
+        public readonly List<(double Order, string Line)> Truncated = [];
+    }
+
+    // Annota un capitolo finito in un file creato (chiamato anche da più capitoli in parallelo)
+    private static void Note(Job job, ChapterInfo chapter, CbzMaker.CbzResult result)
+    {
+        bool numbered = double.TryParse(chapter.Number, NumberStyles.Float, CultureInfo.InvariantCulture, out var n);
+        lock (job.Checks)
+        {
+            if (numbered) job.Checks.Numbers.Add(n);
+            if (result.TruncatedPages.Count > 0)
+                job.Checks.Truncated.Add((numbered ? n : double.MaxValue,
+                    T("Log.TruncatedChapter", chapter.Number, string.Join(", ", result.TruncatedPages))));
+        }
+    }
+
+    // Riepilogo finale: pagine arrivate incomplete dal sito e numeri che mancano nella sequenza dei capitoli
+    private static void ReportChecks(Job job, IProgress<string> log)
+    {
+        if (job.Checks.Truncated.Count > 0)
+        {
+            log.Report("⚠ " + T("Log.TruncatedSummary"));
+            foreach (var (_, line) in job.Checks.Truncated.OrderBy(t => t.Order)) log.Report("  • " + line);
+        }
+        var gaps = MissingNumbers(job.Checks.Numbers);
+        if (gaps.Count > 0)
+            log.Report("⚠ " + T("Log.Gaps", string.Join(", ", gaps.Take(20)) + (gaps.Count > 20 ? " " + T("Volume.AndOthers", gaps.Count - 20) : "")));
+    }
+
+    /// <summary>
+    /// I numeri interi che mancano tra il primo e l'ultimo capitolo (60 manca anche se c'è 60.5).
+    /// Nessuno se i numeri non sembrano una sequenza di capitoli (più buchi che capitoli).
+    /// </summary>
+    internal static List<int> MissingNumbers(IReadOnlyCollection<double> numbers)
+    {
+        if (numbers.Count < 2) return [];
+        int lo = (int)Math.Ceiling(numbers.Min()), hi = (int)Math.Floor(numbers.Max());
+        if (hi - lo > 100_000) return [];
+        var present = numbers.Where(n => n == Math.Floor(n)).Select(n => (int)n).ToHashSet();
+        var missing = Enumerable.Range(lo, Math.Max(0, hi - lo + 1)).Where(n => !present.Contains(n)).ToList();
+        return missing.Count > numbers.Count ? [] : missing;
     }
 
     // Un file per capitolo (.cbz, oppure .epub / .kepub.epub). Restituisce true se un sito ha chiesto la verifica anti-bot.
@@ -318,19 +368,22 @@ public partial class MainWindow : Window
         {
             // Con più indirizzi il nome scelto riceve un numero progressivo
             string? name = job.BaseName is null ? null : job.Urls.Count == 1 ? job.BaseName : $"{job.BaseName} {i + 1:D2}";
-            string cbz = await maker.CreateAsync(job.Urls[i], job.Folder, name, job.MinSide, chapterLog, ct, job.ForceReader);
+            var result = await maker.CreateAsync(job.Urls[i], job.Folder, name, job.MinSide, chapterLog, ct, job.ForceReader);
+            string cbz = result.Path;
+            var chapter = Chapter(job, i, cbz);
             if (job.Book is not { } book)
             {
                 chapterLog.Report(T("Log.Created", cbz));
                 files[i] = cbz;
+                Note(job, chapter, result);
                 return;
             }
-            var chapter = Chapter(job, i, cbz);
             string epub = await Task.Run(() => EpubMaker.Create(book, chapter, job.Folder));
             chapterLog.Report(T("Log.ChapterCreated", chapter.Number, epub));
             if (job.KeepCbz) chapterLog.Report(T("Log.Kept", cbz));
             else File.Delete(cbz);
             files[i] = epub;
+            Note(job, chapter, result);
         });
         _lastFile = files.LastOrDefault(f => f is not null) ?? _lastFile;
         log.Report(T("Log.Done", files.Count(f => f is not null), job.Urls.Count));
@@ -429,6 +482,7 @@ public partial class MainWindow : Window
                 Book = job.Book,
                 FirstChapter = job.FirstChapter + start,
                 Parallel = job.Parallel,
+                Checks = job.Checks,
             };
             log.Report(T("Log.SplitVolume", k + 1, total, Label(job, start), Label(job, start + urls.Count - 1)));
             if (await CreateVolumeAsync(maker, part, log, ct, incomplete))
@@ -462,14 +516,18 @@ public partial class MainWindow : Window
         bool antiBot = false;
         try
         {
-            var cbzs = new string?[job.Urls.Count];
+            var cbzs = new CbzMaker.CbzResult?[job.Urls.Count];
+            var results = new List<CbzMaker.CbzResult>();
             var errors = await ForEachChapterAsync(job, log, ct, async (i, chapterLog) =>
                 cbzs[i] = await maker.CreateAsync(job.Urls[i], temp, null, job.MinSide, chapterLog, ct, job.ForceReader));
             // Nell'ordine degli indirizzi, qualunque sia l'ordine in cui sono finiti
             for (int i = 0; i < job.Urls.Count; i++)
             {
                 if (cbzs[i] is { } cbz)
-                    chapters.Add(Chapter(job, i, cbz));
+                {
+                    chapters.Add(Chapter(job, i, cbz.Path));
+                    results.Add(cbz);
+                }
                 else
                     failed.Add(_found.TryGetValue(job.Urls[i], out var f) ? T("Common.ChapterN", Format(f.Number)) : job.Urls[i]);
             }
@@ -520,6 +578,7 @@ public partial class MainWindow : Window
             }
             log.Report(T("Log.VolumeDone", chapters.Count));
             job.Created = true;
+            for (int i = 0; i < chapters.Count; i++) Note(job, chapters[i], results[i]);
             if (failed.Count > 0) incomplete?.Add($"{Path.GetFileName(_lastFile)}: {string.Join(", ", failed)}");
             return antiBot;
         }

@@ -103,6 +103,9 @@
   "Log.SplitMissing": "⚠ Volume creato senza: {0}.",
   "Log.SplitIncomplete": "⚠ Volumi con capitoli mancanti (puoi rifarli con dal/al):",
   "Log.SplitDone": "Fatto: {0} volumi di {1} creati.",
+  "Log.TruncatedSummary": "Pagine arrivate incomplete dal sito (in parte grigie; riscaricarle non serve finché il sito non le corregge):",
+  "Log.TruncatedChapter": "capitolo {0}: pag. {1}",
+  "Log.Gaps": "Numeri di capitolo che mancano nei file creati: {0}. Controlla se sul sito ci sono (a volte un numero viene saltato o un capitolo ha un altro numero).",
   "Log.VolumeNumberInvalid": "Numero volume non valido: \"{0}\". Dividendo in più volumi serve un numero intero (es. 1) oppure lascialo vuoto.",
 
   "Volume.FailedTitle": "Capitoli non scaricati",
@@ -125,6 +128,7 @@
   "Engine.NotAvailable": "Trovata una sola immagine orizzontale: probabilmente il capitolo non è (ancora) disponibile.",
   "Engine.Found": "Trovate {0} immagini.",
   "Engine.Skipped": "saltata: {0}",
+  "Engine.Truncated": "pagina {0} incompleta anche sul sito: tenuta così (in parte grigia)",
   "Engine.Retry": "Il sito non ha risposto come previsto: riprovo (tentativo {0} di {1})...",
   "Engine.NoValidImages": "Nessuna immagine valida scaricata.",
   "Engine.AntiBot": "Protezione anti-bot trovata su {0}: spunta \"{1}\" e riprova. Se nella finestra compare una verifica, completala tu e il download proseguirà da solo.",
