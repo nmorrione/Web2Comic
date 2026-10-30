@@ -97,10 +97,13 @@ public partial class MainWindow : Window
 
     private void chkVolume_IsCheckedChanged(object? sender, RoutedEventArgs e)
     {
-        pnlVolumeNumber.IsVisible = chkVolume.IsChecked == true;
+        pnlVolumeNumber.IsVisible = pnlSplit.IsVisible = chkVolume.IsChecked == true;
         UpdateStartLabel();
         FitHeight();
     }
+
+    private void chkSplit_IsCheckedChanged(object? sender, RoutedEventArgs e) =>
+        numSplit.IsEnabled = chkSplit.IsChecked == true;
 
     /// <summary>
     /// Adatta l'altezza della finestra a quello che mostra: la allunga quando compaiono pannelli
@@ -229,7 +232,13 @@ public partial class MainWindow : Window
             Volume = chkVolume.IsChecked == true,
             VolumeNumber = string.IsNullOrWhiteSpace(txtVolume.Text) ? null : txtVolume.Text.Trim(),
             Parallel = chkParallel.IsChecked == true ? (int)(numParallel.Value ?? 3) : 1,
+            SplitSize = chkVolume.IsChecked == true && chkSplit.IsChecked == true ? (int)(numSplit.Value ?? 50) : 0,
         };
+        if (job.SplitSize > 0 && job.VolumeNumber is { } v && !int.TryParse(v, out _))
+        {
+            Log(T("Log.VolumeNumberInvalid", v));
+            return;
+        }
 
         // Opzioni EPUB: dati della serie e numero del primo capitolo
         if (chkEpub.IsChecked == true)
@@ -250,7 +259,9 @@ public partial class MainWindow : Window
         try
         {
             await using var maker = await CbzMaker.StartAsync(chkShow.IsChecked == true, log);
-            antiBot = job.Volume
+            antiBot = job.SplitSize > 0 && job.Urls.Count > job.SplitSize
+                ? await CreateSplitVolumesAsync(maker, job, log, _cts.Token)
+                : job.Volume
                 ? await CreateVolumeAsync(maker, job, log, _cts.Token)
                 : await CreateChaptersAsync(maker, job, log, _cts.Token);
             if (antiBot)
@@ -291,6 +302,10 @@ public partial class MainWindow : Window
         public double? FirstChapter;
         /// <summary>Quanti capitoli scaricare insieme (1 = uno alla volta).</summary>
         public int Parallel { get; init; } = 1;
+        /// <summary>Capitoli per volume quando si divide in più volumi (0 = un volume solo).</summary>
+        public int SplitSize { get; init; }
+        /// <summary>Impostato quando il volume è stato creato.</summary>
+        public bool Created { get; set; }
     }
 
     // Un file per capitolo (.cbz, oppure .epub / .kepub.epub). Restituisce true se un sito ha chiesto la verifica anti-bot.
@@ -383,8 +398,61 @@ public partial class MainWindow : Window
             inner.Report(string.Join("\n", value.Split('\n').Select(line => line.Length == 0 ? line : prefix + line)));
     }
 
+    /// <summary>
+    /// Più volumi da <see cref="Job.SplitSize"/> capitoli, uno dopo l'altro: ogni volume si crea appena finiti
+    /// i suoi capitoli, così annullando restano quelli già pronti. Un capitolo non scaricato non ferma tutto
+    /// (nessuna domanda a metà di un lavoro lungo): il volume si crea senza e alla fine si elencano i mancanti.
+    /// </summary>
+    private async Task<bool> CreateSplitVolumesAsync(CbzMaker maker, Job job, IProgress<string> log, CancellationToken ct)
+    {
+        int size = job.SplitSize, total = (job.Urls.Count + size - 1) / size, created = 0;
+        int? firstVolume = job.VolumeNumber is { } v ? int.Parse(v, CultureInfo.InvariantCulture) : null;
+        var incomplete = new List<string>();
+        log.Report(T("Log.SplitStart", job.Urls.Count, total, size));
+        for (int k = 0; k < total; k++)
+        {
+            int start = k * size;
+            var urls = job.Urls.Skip(start).Take(size).ToList();
+            var part = new Job
+            {
+                Urls = urls,
+                Folder = job.Folder,
+                // Nome scelto a mano: "Nome 01", "Nome 02", ...
+                BaseName = job.BaseName is null ? null : $"{job.BaseName} {k + 1:D2}",
+                MinSide = job.MinSide,
+                ForceReader = job.ForceReader,
+                KeepCbz = job.KeepCbz,
+                Volume = true,
+                VolumeNumber = firstVolume is { } f ? (f + k).ToString(CultureInfo.InvariantCulture) : null,
+                Book = job.Book,
+                FirstChapter = job.FirstChapter + start,
+                Parallel = job.Parallel,
+            };
+            log.Report(T("Log.SplitVolume", k + 1, total, Label(job, start), Label(job, start + urls.Count - 1)));
+            if (await CreateVolumeAsync(maker, part, log, ct, incomplete))
+                return true; // verifica anti-bot: inutile andare avanti
+            if (part.Created) created++;
+            log.Report("");
+        }
+        if (incomplete.Count > 0)
+        {
+            log.Report(T("Log.SplitIncomplete"));
+            foreach (var line in incomplete) log.Report("  • " + line);
+        }
+        log.Report(T("Log.SplitDone", created, total));
+        return false;
+    }
+
+    // Numero del capitolo i-esimo per i messaggi: dalla lista capitoli se c'è, altrimenti la posizione
+    private string Label(Job job, int i) =>
+        job.FirstChapter is { } first ? Format(first + i)
+        : _found.TryGetValue(job.Urls[i], out var f) ? Format(f.Number)
+        : (i + 1).ToString(CultureInfo.InvariantCulture);
+
     // Tutti i capitoli in un unico file. Ogni capitolo viene prima scaricato in una cartella temporanea.
-    private async Task<bool> CreateVolumeAsync(CbzMaker maker, Job job, IProgress<string> log, CancellationToken ct)
+    // Con incomplete (volumi divisi) non chiede nulla se manca qualche capitolo: crea il volume e lo annota lì.
+    private async Task<bool> CreateVolumeAsync(CbzMaker maker, Job job, IProgress<string> log, CancellationToken ct,
+        List<string>? incomplete = null)
     {
         string temp = Path.Combine(Path.GetTempPath(), "Web2Comic", Guid.NewGuid().ToString("N"));
         var chapters = new List<ChapterInfo>();
@@ -410,7 +478,11 @@ public partial class MainWindow : Window
                 log.Report(T("Log.VolumeNoChapters"));
                 return antiBot;
             }
-            if (failed.Count > 0)
+            if (failed.Count > 0 && incomplete is not null)
+            {
+                log.Report(T("Log.SplitMissing", string.Join(", ", failed)));
+            }
+            else if (failed.Count > 0)
             {
                 string list = string.Join("\n", failed.Take(10).Select(f => "• " + f)) + (failed.Count > 10 ? "\n• " + T("Volume.AndOthers", failed.Count - 10) : "");
                 string missing = failed.Count == 1 ? T("Volume.MissingOne", job.Urls.Count) : T("Volume.MissingMany", failed.Count, job.Urls.Count);
@@ -445,6 +517,8 @@ public partial class MainWindow : Window
                 log.Report(T("Log.VolumeCreated", _lastFile));
             }
             log.Report(T("Log.VolumeDone", chapters.Count));
+            job.Created = true;
+            if (failed.Count > 0) incomplete?.Add($"{Path.GetFileName(_lastFile)}: {string.Join(", ", failed)}");
             return antiBot;
         }
         finally
@@ -527,6 +601,8 @@ public partial class MainWindow : Window
         chkEpub.IsEnabled = chkVolume.IsEnabled = chkParallel.IsEnabled = !running;
         pnlEpub.IsEnabled = !running && chkEpub.IsChecked == true;
         numParallel.IsEnabled = !running && chkParallel.IsChecked == true;
+        chkSplit.IsEnabled = !running;
+        numSplit.IsEnabled = !running && chkSplit.IsChecked == true;
         progress.IsIndeterminate = running;
     }
 

@@ -34,8 +34,11 @@
     <!-- ===== Colonna sinistra: cosa scaricare, dove, come ===== -->
     <StackPanel Grid.Column="0" Spacing="4">
 
-      <!-- Lingua dell'interfaccia -->
-      <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,0,0,6">
+      <!-- Lista capitoli: ne ricava gli indirizzi e li mette in "Indirizzi".
+           Sulla stessa riga dell'etichetta, a destra, la lingua dell'interfaccia (fa risparmiare una riga) -->
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+      <TextBlock VerticalAlignment="Bottom" Text="{local:Tr Main.ListLabel}" TextWrapping="Wrap" />
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="0,0,0,2">
         <TextBlock VerticalAlignment="Center" Margin="0,0,4,0" Text="{local:Tr Main.LanguageLabel}" />
         <Button x:Name="btnLangIt" Classes="flag" Tag="it" ToolTip.Tip="Italiano" Click="btnLanguage_Click">
           <Border CornerRadius="2" ClipToBounds="True"><Image Source="avares://Web2Comic/Assets/flags/it.png" Width="27" Height="18" /></Border>
@@ -47,9 +50,7 @@
           <Border CornerRadius="2" ClipToBounds="True"><Image Source="avares://Web2Comic/Assets/flags/es.png" Width="27" Height="18" /></Border>
         </Button>
       </StackPanel>
-
-      <!-- Lista capitoli: ne ricava gli indirizzi e li mette in "Indirizzi" -->
-      <TextBlock Text="{local:Tr Main.ListLabel}" TextWrapping="Wrap" />
+      </Grid>
       <Grid ColumnDefinitions="*,Auto,70,Auto,70,Auto" ColumnSpacing="6">
         <TextBox x:Name="txtListUrl" PlaceholderText="https://..." />
         <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{local:Tr Main.From}" />
@@ -60,7 +61,7 @@
       </Grid>
 
       <TextBlock Margin="0,6,0,0" Text="{local:Tr Main.Urls}" />
-      <TextBox x:Name="txtUrls" Height="110" AcceptsReturn="True" TextWrapping="NoWrap" />
+      <TextBox x:Name="txtUrls" Height="80" AcceptsReturn="True" TextWrapping="NoWrap" />
 
       <TextBlock Margin="0,6,0,0" Text="{local:Tr Main.FileName}" TextWrapping="Wrap" />
       <TextBox x:Name="txtName" />
@@ -92,6 +93,16 @@
       <CheckBox x:Name="chkVolume" IsCheckedChanged="chkVolume_IsCheckedChanged">
         <TextBlock Text="{local:Tr Main.SingleVolume}" TextWrapping="Wrap" />
       </CheckBox>
+      <!-- Solo con "Crea singolo volume": tanti capitoli diventano più volumi da N capitoli -->
+      <WrapPanel x:Name="pnlSplit" Margin="28,0,0,0" Orientation="Horizontal" ItemSpacing="10" LineSpacing="4"
+                 IsVisible="False" ToolTip.Tip="{local:Tr Main.SplitTip}">
+        <CheckBox x:Name="chkSplit" Content="{local:Tr Main.Split}" IsCheckedChanged="chkSplit_IsCheckedChanged" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <NumericUpDown x:Name="numSplit" Width="120" Minimum="2" Maximum="1000" Increment="10" Value="50" FormatString="0"
+                         IsEnabled="False" />
+          <TextBlock VerticalAlignment="Center" Text="{local:Tr Main.SplitUnit}" />
+        </StackPanel>
+      </WrapPanel>
     </StackPanel>
 
     <!-- ===== Colonna destra: EPUB con i dati della serie (attiva solo con la spunta) ===== -->

@@ -55,6 +55,11 @@ e premi **Trova capitoli**: gli indirizzi finiscono in **Indirizzi**, dove puoi 
 "La mia serie - Capitoli 001-010" (oppure come scrivi in **Nome file**). Se qualche capitolo non si riesce a scaricare,
 l'app te lo dice e ti chiede se creare comunque il volume con gli altri.
 
+**Una serie intera?** Con centinaia di capitoli spunta anche **Dividi in volumi da N capitoli** (50 è un buon valore):
+l'app crea Vol. 01, Vol. 02... uno dopo l'altro, ognuno appena finiti i suoi capitoli. Un unico file enorme sarebbe
+lentissimo sull'ebook reader, e il Kobo non copia file oltre 4 GB. Se un capitolo non si riesce a scaricare l'app non
+si ferma: crea il volume senza e alla fine ti elenca i capitoli mancanti.
+
 **Un EPUB invece del CBZ?** Spunta **Crea EPUB**, scrivi il nome della serie (ed eventualmente autore, genere, trama...)
 e copia gli EPUB nell'ebook reader via USB. Con il volume puoi indicare anche il **Numero volume**: vedrai "La mia serie Vol. 01".
 Se leggi su un **Kobo**, spunta anche **Ottimizzato per Kobo**.
@@ -79,6 +84,7 @@ Di solito **niente**: Web2Comic capisce da solo se la pagina mostra tutto il cap
 | **Crea EPUB** | Vuoi gli EPUB con i dati della serie invece del semplice `.cbz`. |
 | **Ottimizzato per Kobo** | Leggi gli EPUB su un Kobo. |
 | **Crea singolo volume** | Vuoi tutti i capitoli in un unico file invece di uno per capitolo. |
+| **Dividi in volumi da N capitoli** | Scarichi una serie intera: invece di un file enorme ottieni un volume ogni N capitoli. |
 | **Scarica più capitoli in parallelo** | Scarichi tanti capitoli e vuoi fare prima (3 alla volta è un buon valore; se il sito inizia a dare errori, abbassalo). |
 
 Hai già una cartella piena di `.cbz`? Il pulsante **Converti CBZ in EPUB...** li trasforma tutti in una volta, senza scaricare nulla, con una tabella per correggere numeri e titoli dei capitoli.

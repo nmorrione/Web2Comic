@@ -55,6 +55,11 @@ y pulsa **Buscar capítulos**: las direcciones pasan a **Direcciones**, donde pu
 "Mi serie - Capítulos 001-010" (o como escribas en **Nombre del archivo**). Si algún capítulo no se puede descargar,
 la aplicación te avisa y te pregunta si quieres crear el tomo de todos modos con los demás.
 
+**¿Una serie entera?** Con cientos de capítulos marca también **Dividir en tomos de N capítulos** (50 es un buen valor):
+la aplicación crea Vol. 01, Vol. 02... uno tras otro, cada uno en cuanto terminan sus capítulos. Un único archivo enorme
+sería lentísimo en el lector, y el Kobo no copia archivos de más de 4 GB. Si un capítulo no se puede descargar la aplicación
+no se detiene: crea el tomo sin él y al final te enumera los capítulos que faltan.
+
 **¿Un EPUB en lugar del CBZ?** Marca **Crear EPUB**, escribe el nombre de la serie (y si quieres autor, género, sinopsis...)
 y copia los EPUB al lector por USB. Con el tomo también puedes indicar el **Número de tomo**: verás "Mi serie Vol. 01".
 Si lees en un **Kobo**, marca también **Optimizado para Kobo**.
@@ -79,6 +84,7 @@ Normalmente **nada**: Web2Comic entiende solo si la página muestra el capítulo
 | **Crear EPUB** | Quieres EPUB con los datos de la serie en lugar del simple `.cbz`. |
 | **Optimizado para Kobo** | Lees los EPUB en un Kobo. |
 | **Crear un solo tomo** | Quieres todos los capítulos en un único archivo en lugar de uno por capítulo. |
+| **Dividir en tomos de N capítulos** | Descargas una serie entera: en lugar de un archivo enorme obtienes un tomo cada N capítulos. |
 | **Descargar varios capítulos en paralelo** | Descargas muchos capítulos y quieres terminar antes (3 a la vez es un buen valor; si el sitio empieza a dar errores, bájalo). |
 
 ¿Ya tienes una carpeta llena de `.cbz`? El botón **Convertir CBZ a EPUB...** los convierte todos de una vez, sin descargar nada, con una tabla para corregir números y títulos de los capítulos.

@@ -55,6 +55,11 @@ and press **Find chapters**: the addresses go into **Addresses**, where you can 
 "My series - Chapters 001-010" (or whatever you write in **File name**). If some chapters can't be downloaded,
 the app tells you and asks whether to create the volume anyway with the others.
 
+**A whole series?** With hundreds of chapters, also tick **Split into volumes of N chapters** (50 is a good value):
+the app creates Vol. 01, Vol. 02... one after the other, each as soon as its chapters are done. A single huge file
+would be very slow on an ebook reader, and the Kobo can't copy files over 4 GB. If a chapter can't be downloaded
+the app doesn't stop: it creates the volume without it and lists the missing chapters at the end.
+
 **An EPUB instead of a CBZ?** Tick **Create EPUB**, write the series name (and optionally author, genre, summary...)
 and copy the EPUBs to your ebook reader via USB. With a volume you can also set the **Volume number**: you'll see "My series Vol. 01".
 If you read on a **Kobo**, also tick **Optimized for Kobo**.
@@ -79,6 +84,7 @@ Usually **nothing**: Web2Comic works out on its own whether the page shows the w
 | **Create EPUB** | You want EPUBs with series details instead of plain `.cbz` files. |
 | **Optimized for Kobo** | You read the EPUBs on a Kobo. |
 | **Create a single volume** | You want all the chapters in one file instead of one per chapter. |
+| **Split into volumes of N chapters** | You're downloading a whole series: instead of one huge file you get one volume every N chapters. |
 | **Download several chapters in parallel** | You're downloading many chapters and want it faster (3 at a time is a good value; if the site starts giving errors, lower it). |
 
 Already have a folder full of `.cbz` files? The **Convert CBZ to EPUB...** button converts them all at once, without downloading anything, with a table to fix chapter numbers and titles.

@@ -37,6 +37,10 @@ Exe singolo portable per Windows (runtime .NET incluso) in `publish-portable\`:
 dotnet publish Web2Comic.csproj -p:PublishProfile=Portable
 ```
 
+## Screenshot del README
+`docs/readme-shots.ps1` (dopo `dotnet build -c Release`) apre la finestra nelle tre lingue con dati di esempio e
+rigenera `docs/screenshot-it|en|es.png`. Va rifatto quando cambia l'aspetto della finestra.
+
 ## Da terminale
 - `Web2Comic --cli <indirizzo> [cartella] [--reader] [--show]`: crea il `.cbz` senza aprire la finestra
   (`--reader` forza lo sfoglio del reader, `--show` mostra il browser).
