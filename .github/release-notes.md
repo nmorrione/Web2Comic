@@ -1,5 +1,8 @@
 🇬🇧 English · [🇮🇹 Italiano](https://github.com/nmorrione/Web2Comic/blob/main/README.it.md) · [🇪🇸 Español](https://github.com/nmorrione/Web2Comic/blob/main/README.es.md)
 
+## What's new in 1.8.2
+- No more slowdowns when downloading many chapters: images are released from memory as soon as they're saved, and the log keeps only its last 2000 lines.
+
 ## What's new in 1.8.1
 - **Find chapters** now also recognizes sites whose chapter addresses end with a code instead of the number (the number is read from the link text).
 - Fixed readers that reload the whole page at every page turn: their pages were found but then skipped.
